@@ -63,6 +63,8 @@ def sim_step(planets, dt):
 			dy2= dy**2
 			r2 = dx2 + dy2
 			r  = math.sqrt(r2)
+			if r >= 10000:
+				continue	#あんまり遠かったら計算しない
 			cx = 1
 			if dx < 0.0:
 				cx = -1
@@ -73,7 +75,8 @@ def sim_step(planets, dt):
 			if dx2 < 0.000001:
 				if dy2 < 0.000001:
 					print('衝突:' + str(i) + ',' + str(j))
-				ay = ay + (m * cy / dy2)
+				if dy2 != 0.0:
+					ay = ay + (m * cy / dy2)
 			elif dy2 < 0.000001:
 				ax = ax + (m * cx / dx2)
 			else:
@@ -92,6 +95,8 @@ def sim_step(planets, dt):
 
 def plot(data, planets, dt, endtime):
 	plot.count += 1
+	if plot.count == 3:
+		input('>>')
 	if plot.time > endtime:
 		return
 	
@@ -112,14 +117,14 @@ plot.time = 0.0
 plot.count= 0
 
 def main():
-	nP = 4
-	dt = 1
-	endtime = 1000
+	nP = 5
+	dt = 0.1
+	endtime = 10000
 	
 	planets = []
 	init(planets, nP)
 	
-	planets[0].mass	= 5000
+	planets[0].mass	= 1000
 	planets[1].x	= 600
 	planets[1].y	= 0
 	planets[1].vy	= 4
@@ -133,11 +138,23 @@ def main():
 	planets[3].y	= 400
 	planets[3].vx	= -5
 	planets[3].mass	= 5
+	planets[4].mass = 5000
+	planets[4].x	= 1000
+	planets[4].y	= 500
+	planets[4].vx	= 2
+	planets[4].vy	= -2
+
+	
+	for i in range(4, nP):
+		planets[i].mass = 0.01
+		planets[i].x = i*10
+		planets[i].y = 30
+		planets[i].vx= 10
 	
 	fig = plt.figure()
-	ani = anim.FuncAnimation(fig, plot, fargs = (planets, dt, endtime), interval=10, frames=1000)
-	ani.save('output.gif', writer='imagemagick')
-#	plt.show()
+	ani = anim.FuncAnimation(fig, plot, fargs = (planets, dt, endtime), interval=10)
+#	ani.save('output.gif', writer='imagemagick')
+	plt.show()
 
 if __name__ == '__main__':
 	main()
